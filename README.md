@@ -12,6 +12,20 @@ The goal of lutzimporttest is to test the importing of sf, which is a
 suggested package in lutz, in a package which depends on lutz so that
 the “accurate” method of `lutz::tz_lookup()` is possible.
 
+The lutz package has the {sf} package in `Suggests`, and only uses {sf}
+functions conditionally when using the “acccurate” method, and checks
+that {sf} is installed first. Because {sf} is in `Suggests`, it does not
+get installed automatically when lutz is installed, which makes it
+tricky for a pacakge that depends on lutz to use the functionality which
+depends on {sf} (`tz_lookup(..., method = "accurate")`). The approach
+here is to include {sf} in `Imports` so that {sf} is installed
+automatically in the reverse dependency that requires it. The issue is
+that because {sf} functions are not called directly by the reverse
+dependency, `R CMD check` complains about unused imports. The solution
+is to include a call to any {sf} function in a “stub” function that is
+never actually used in the package. This function is called
+`ignore_unused_imports()`.
+
 ## Installation
 
 You can install the development version of lutzimporttest from
